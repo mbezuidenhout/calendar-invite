@@ -57,6 +57,15 @@ class Calendar_Invite {
 	 */
 	protected $version;
 
+    /**
+     * Plugin options
+     *
+     * @since   1.0.0
+     * @access  private
+     * @var     array
+     */
+    private $options;
+
 	/**
 	 * Define the core functionality of the plugin.
 	 *
@@ -73,8 +82,9 @@ class Calendar_Invite {
 			$this->version = '1.0.0';
 		}
 		$this->plugin_name = 'calendar-invite';
+        $this->options = $this->set_options();
 
-		$this->load_dependencies();
+        $this->load_dependencies();
 		$this->set_locale();
 		$this->define_admin_hooks();
 		$this->define_public_hooks();
@@ -152,16 +162,33 @@ class Calendar_Invite {
 	 */
 	private function define_admin_hooks() {
 
-		$plugin_admin = new Calendar_Invite_Admin( $this->get_plugin_name(), $this->get_version() );
+		$plugin_admin = new Calendar_Invite_Admin( $this->get_plugin_name(), $this->get_version(), $this->options );
 
+        /* @see Calendar_Invite_Admin::enqueue_styles() */
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
+        /* @see Calendar_Invite_Admin::enqueue_scripts() */
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
 
+        /* @see Calendar_Invite_Admin::add_options_page() */
+        $this->loader->add_action( 'admin_menu', $plugin_admin, 'add_options_page');
+        /* @see Calendar_Invite_Admin::settings_init() */
+        $this->loader->add_action( 'admin_init', $plugin_admin, 'settings_init');
+        /* @see Calendar_Invite_Admin::settings_sections_init() */
+		$this->loader->add_action( 'admin_init', $plugin_admin, 'settings_sections_init');
+        /* @see Calendar_Invite_Admin::settings_fields_init() */
+        $this->loader->add_action( 'admin_init', $plugin_admin, 'settings_fields_init');
+
+        /* @see Calendar_Invite_Admin::add_calendar_invite_order_actions() */
+        $this->loader->add_filter( 'woocommerce_admin_order_actions', $plugin_admin, 'add_calendar_invite_order_actions', 10, 2 );
+
+        /* @see Calendar_Invite_Admin::extra_user_profile_fields() */
         $this->loader->add_action( 'show_user_profile', $plugin_admin, 'extra_user_profile_fields' , 10, 1);
         $this->loader->add_action( 'edit_user_profile', $plugin_admin, 'extra_user_profile_fields' , 10, 1);
+        /* @see Calendar_Invite::save_extra_user_profile_fields() */
         $this->loader->add_action( 'personal_options_update', $this, 'save_extra_user_profile_fields' );
         $this->loader->add_action( 'edit_user_profile_update', $this, 'save_extra_user_profile_fields' );
 
+        /* @see Calendar_Invite_Admin::calendar_invite_install() */
         $this->loader->add_action( 'plugins_loaded', $plugin_admin, 'calendar_invite_install', 11);
 	}
 
@@ -174,14 +201,22 @@ class Calendar_Invite {
 	 */
 	private function define_public_hooks() {
 
-		$plugin_public = new Calendar_Invite_Public( $this->get_plugin_name(), $this->get_version() );
+		$plugin_public = new Calendar_Invite_Public( $this->get_plugin_name(), $this->get_version(), $this->options );
 
+		/* @see Calendar_Invite_Public::enqueue_styles() */
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
+        /* @see Calendar_Invite_Public::enqueue_scripts() */
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
 
+        /* @see Calendar_Invite_Public::extra_user_profile_fields() */
         $this->loader->add_action( 'woocommerce_edit_account_form', $plugin_public, 'extra_user_profile_fields');
+        /* @see Calendar_Invite::save_extra_user_profile_fields() */
         $this->loader->add_action( 'woocommerce_save_account_details', $this, 'save_extra_user_profile_fields');
-	}
+        /* @see Calendar_Invite::send_calendar_invites() */
+        $this->loader->add_action( 'woocommerce_order_status_processing', $this, 'send_calendar_invites', 1, 1);
+
+        $this->loader->add_action( 'wp_ajax_' . $this->plugin_name . '_send_invite', $this, 'send_calendar_invites_ajax');
+    }
 
 	/**
 	 * Run the loader to execute all of the hooks with WordPress.
@@ -239,6 +274,50 @@ class Calendar_Invite {
             add_user_meta( $user_id, 'email_invites', 'true');
         } else
             delete_user_meta( $user_id, 'email_invites');
+    }
+
+    /**
+     * Sets the class variable $options
+     */
+    public function set_options() {
+        return get_option( $this->plugin_name . '-options' );
+    }
+
+    public function send_calendar_invites_ajax() {
+        if(empty($_REQUEST['order_id']))
+            return 'Error obtaining order_id is REQUEST variables';
+        $order_id = $_REQUEST['order_id'];
+        $this->send_calendar_invites($order_id);
+        wp_die();
+    }
+
+    public function send_calendar_invites($order_id) {
+        $order = new WC_Order($order_id);
+        $order_items = $order->get_items();
+
+        foreach ($order_items as $item) {
+            /* @var WC_Meta_Data[] $item_meta_data */
+            $item_meta_data = $item->get_meta_data();
+            $date = null;
+            $time = null;
+
+            foreach($item_meta_data as $meta) {
+                $data = $meta->get_data();
+                if($data['key'] == $this->options[$this->plugin_name . '-date-field']) {
+                    $date = $data['value'];
+                }
+                if($data['key'] == $this->options[$this->plugin_name . '-time-field']) {
+                    $time = $data['value'];
+                }
+            }
+
+            if(!empty($date) && !empty($time)) {
+                // Send e-mail with ical invite
+                $customer = new WC_Customer($order->get_customer_id());
+                wp_mail($customer->get_email(), $item->get_name(), 'ical invite');
+            }
+
+        }
     }
 
 }

@@ -28,5 +28,9 @@
 	 * Although scripts in the WordPress core, Plugins and Themes may be
 	 * practising this, we should strive to set a better example in our own work.
 	 */
+	$(".wc-action-button-invite").click(function() {
+		test = 1;
+		//Do stuff when clicked
+	});
 
 })( jQuery );

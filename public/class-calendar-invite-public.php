@@ -46,12 +46,13 @@ class Calendar_Invite_Public {
 	 * @since    1.0.0
 	 * @param      string    $plugin_name       The name of the plugin.
 	 * @param      string    $version    The version of this plugin.
+     * @param       array    $options   Plugin options.
 	 */
-	public function __construct( $plugin_name, $version ) {
+	public function __construct( $plugin_name, $version, $options ) {
 
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
-
+        $this->options = $options;
 	}
 
 	/**
