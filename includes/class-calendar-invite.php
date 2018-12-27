@@ -76,8 +76,8 @@ class Calendar_Invite {
 	 * @since    1.0.0
 	 */
 	public function __construct() {
-		if ( defined( 'PLUGIN_NAME_VERSION' ) ) {
-			$this->version = PLUGIN_NAME_VERSION;
+		if ( defined( 'CALENDAR_INVITE' ) ) {
+			$this->version = CALENDAR_INVITE;
 		} else {
 			$this->version = '1.0.0';
 		}
@@ -314,7 +314,37 @@ class Calendar_Invite {
             if(!empty($date) && !empty($time)) {
                 // Send e-mail with ical invite
                 $customer = new WC_Customer($order->get_customer_id());
-                wp_mail($customer->get_email(), $item->get_name(), 'ical invite');
+                $dtstart = strtotime($date . ' ' . $time);
+                $eventuid = md5($order_id . '-' . $item->get_name() . '-' . $order->get_customer_id() . '-' . $date . '-' . $time);
+
+                // Set the correct headers for this file
+                ob_start();
+                /* @see ../public/partials/calendar-invite-ical.php */
+                include(plugin_dir_path( dirname( __FILE__ ) ) . 'public/partials/calendar-invite-ical.php');
+                //Collect output and echo
+                $ical = ob_get_contents();
+                ob_end_clean();
+                // Set content-type
+                // Set own boundary
+                $multipart_boundary = md5(uniqid(time()));
+                $headers = array(
+                    "Content-Type: multipart/mixed; boundary=\"$multipart_boundary\"",
+                    "X-Calendar-Invite: " . $this->get_version()
+                );
+                // Set message to multipart message
+
+                $message = "--" . $multipart_boundary . "\n";
+                $message .= "Content-Type: text/calendar; charset=\"UTF-8\"; method=PUBLISH\n";
+                $message .= "Content-Transfer-Encoding: 7bit\n\n";
+                $message .= $ical . "\n";
+                $message .= '--' . $multipart_boundary . "\n";
+                $message .= "Content-Type: application/ics; name=\"invite.ics\"\n";
+                $message .= "Content-Disposition: attachment; filename=\"invite.ics\"\n";
+                $message .= "Content-Transfer-Encoding: base64\n\n";
+                $message .= base64_encode($ical) . "\n";
+                $message .= "--" . $multipart_boundary . "--\n"; // End messages
+
+                wp_mail($customer->get_email(), $item->get_name(),  $message, $headers);
             }
 
         }

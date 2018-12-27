@@ -40,6 +40,15 @@ class Calendar_Invite_Public {
 	 */
 	private $version;
 
+    /**
+     * Plugin options
+     *
+     * @since   1.0.0
+     * @access  private
+     * @var     array
+     */
+    private $options;
+
 	/**
 	 * Initialize the class and set its properties.
 	 *
