@@ -1,10 +1,15 @@
 <?php
 
+// Load PHPMailer class, so we can subclass it.
+if ( ! class_exists( 'PHPMailer', false ) ) {
+    require_once ABSPATH . WPINC . '/class-phpmailer.php';
+}
+
 /**
- * PHPMailerCalendarInvite - PHP email creation and transport class.
- * @package PHPMailerCalendarInvite
+ * Calendar_Invite_Mailer - PHP email creation and transport class.
+ * @package Calendar_Invite_Mailer
  */
-class PHPMailerCalendarInvite extends PHPMailer {
+class Calendar_Invite_Mailer extends \WPMailSMTP\MailCatcher {
 
     public function createBody() {
         $body = '';

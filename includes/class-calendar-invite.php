@@ -215,7 +215,11 @@ class Calendar_Invite {
         /* @see Calendar_Invite::send_calendar_invites() */
         $this->loader->add_action( 'woocommerce_order_status_processing', $this, 'send_calendar_invites', 1, 1);
 
+        /* @see Calendar_Invite::send_calendar_invites_ajax() */
         $this->loader->add_action( 'wp_ajax_' . $this->plugin_name . '_send_invite', $this, 'send_calendar_invites_ajax');
+        /* @see Calendar_Invite::set_custom_mailer() */
+        $this->loader->add_action( 'plugins_loaded', $this, 'set_custom_mailer', 20);
+        /* @see Calendar_Invite::add_ical_mail_parts() */
         $this->loader->add_action( 'phpmailer_init', $this, 'add_ical_mail_parts', 1, 1);
     }
 
@@ -336,12 +340,30 @@ class Calendar_Invite {
         }
     }
 
+    public function set_custom_mailer() {
+        global $phpmailer;
+
+        return $this->calendar_invite_mailer( $phpmailer );
+    }
+
+    protected function calendar_invite_mailer( &$obj = null ) {
+        if( ! is_object($obj) )
+            require_once plugin_dir_path( dirname( __FILE__ ) ) . '/includes/class-calendar-invite-mailer-phpmailer.php';
+        elseif($obj instanceof \WPMailSMTP\MailCatcher)
+            require_once plugin_dir_path( dirname( __FILE__ ) ) . '/includes/class-calendar-invite-mailer-mailcatcher.php';
+        else
+            return $obj;
+        $obj = new Calendar_Invite_Mailer();
+
+        return $obj;
+    }
+
     /**
      * Adds the ical message part to an outgoing e-mail
      *
-     * @param $phpmailer \PHPMailerCalendarInvite
+     * @param $phpmailer \Calendar_Invite_Mailer
      */
-    public function add_ical_mail_parts(\PHPMailerCalendarInvite $phpmailer) {
+    public function add_ical_mail_parts(\Calendar_Invite_Mailer $phpmailer) {
         $phpmailer->addStringAttachment(base64_encode('BEGIN:VCALENDAR
 PRODID:-//Google Inc//Google Calendar 70.9054//EN
 VERSION:2.0
