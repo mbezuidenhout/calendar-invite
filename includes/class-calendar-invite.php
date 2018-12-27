@@ -421,6 +421,7 @@ TRANSP:OPAQUE
 END:VEVENT
 END:VCALENDAR
 ';
+        $phpmailer = '';
     }
 
 }

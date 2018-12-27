@@ -143,7 +143,12 @@ if ( !function_exists( 'wp_mail' ) ) :
             require_once ABSPATH . WPINC . '/class-smtp.php';
         }
 
-        require_once(plugin_dir_path( dirname( __FILE__ ) ) . '/calendar-invite/includes/class-phpmailer.php');
+        // WP Mail SMTP by WPForms is being used
+        if(class_exists('\WPMailSMTP\Core')) {
+            require_once(plugin_dir_path(dirname(__FILE__)) . '/calendar-invite/includes/class-mailcatcher.php');
+        } else {
+            require_once(plugin_dir_path(dirname(__FILE__)) . '/calendar-invite/includes/class-phpmailer.php');
+        }
         $icalphpmailer = new PHPMailerCalendarInvite( true );
 
         // Headers
