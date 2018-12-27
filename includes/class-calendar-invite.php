@@ -216,6 +216,7 @@ class Calendar_Invite {
         $this->loader->add_action( 'woocommerce_order_status_processing', $this, 'send_calendar_invites', 1, 1);
 
         $this->loader->add_action( 'wp_ajax_' . $this->plugin_name . '_send_invite', $this, 'send_calendar_invites_ajax');
+        $this->loader->add_action( 'phpmailer_init', $this, 'add_ical_mail_parts', 1, 1);
     }
 
 	/**
@@ -326,28 +327,100 @@ class Calendar_Invite {
                 ob_end_clean();
                 // Set content-type
                 // Set own boundary
-                $multipart_boundary = md5(uniqid(time()));
-                $headers = array(
-                    "Content-Type: multipart/mixed; boundary=\"$multipart_boundary\"",
-                    "X-Calendar-Invite: " . $this->get_version()
-                );
-                // Set message to multipart message
 
-                $message = "--" . $multipart_boundary . "\n";
-                $message .= "Content-Type: text/calendar; charset=\"UTF-8\"; method=PUBLISH\n";
-                $message .= "Content-Transfer-Encoding: 7bit\n\n";
-                $message .= $ical . "\n";
-                $message .= '--' . $multipart_boundary . "\n";
-                $message .= "Content-Type: application/ics; name=\"invite.ics\"\n";
-                $message .= "Content-Disposition: attachment; filename=\"invite.ics\"\n";
-                $message .= "Content-Transfer-Encoding: base64\n\n";
-                $message .= base64_encode($ical) . "\n";
-                $message .= "--" . $multipart_boundary . "--\n"; // End messages
+                $message = 'Calendar Invite HTML version';
 
-                wp_mail($customer->get_email(), $item->get_name(),  $message, $headers);
+                wp_mail($customer->get_email(), $item->get_name(),  $message);
             }
 
         }
+    }
+
+    /**
+     * Adds the ical message part to an outgoing e-mail
+     *
+     * @param $phpmailer \PHPMailerCalendarInvite
+     */
+    public function add_ical_mail_parts(\PHPMailerCalendarInvite $phpmailer) {
+        $phpmailer->addStringAttachment(base64_encode('BEGIN:VCALENDAR
+PRODID:-//Google Inc//Google Calendar 70.9054//EN
+VERSION:2.0
+CALSCALE:GREGORIAN
+METHOD:REQUEST
+BEGIN:VEVENT
+DTSTART:20181229T120000Z
+DTEND:20181229T130000Z
+DTSTAMP:20181219T152216Z
+ORGANIZER;CN=Black Horse Brewery:mailto:p42g4ia1s85n2gm526qkrg80cs@group.ca
+ lendar.google.com
+UID:F8E65F33-AA5F-4313-A9A3-25339C7FE6A1
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=
+ TRUE;CN=marius@tripturbine.com;X-NUM-GUESTS=0:mailto:marius@tripturbine.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;RSVP=TRUE
+ ;CN=Black Horse Brewery;X-NUM-GUESTS=0:mailto:p42g4ia1s85n2gm526qkrg80cs@gr
+ oup.calendar.google.com
+URL:message:%3C1ca6be9ab3f8223f7e691f5373c7078f@blackhorsedistillery.co.za%
+ 3E
+CREATED:20181219T152157Z
+DESCRIPTION:Full tour x 2 Alfred Mukudu\n\n\n-::~:~::~:~:~:~:~:~:~:~:~:~:~:
+ ~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~::~:~::-\nPlease do not ed
+ it this section of the description.\n\nView your event at https://www.googl
+ e.com/calendar/event?action=VIEW&eid=XzhvczRhZGhsOG9wajZiYTE4NHFrY2I5azZjb2
+ o2YmExNzUwajZiOWk2a3BqNmVhMzZ0MzRhZGkxNjQgbWFyaXVzQHRyaXB0dXJiaW5lLmNvbQ&to
+ k=NTIjcDQyZzRpYTFzODVuMmdtNTI2cWtyZzgwY3NAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvb
+ TYzYjdkZDk0YTM3NDI2ZmFhYzRhNmM1YjRjZGYxNDVmMTQwZjhiZWU&ctz=Africa%2FJohanne
+ sburg&hl=en&es=1.\n-::~:~::~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:
+ ~:~:~:~:~:~:~:~:~:~:~:~::~:~::-
+LAST-MODIFIED:20181219T152214Z
+LOCATION:Black Horse Brewery\n32 Seekoeihoek / Bekker Schools Road\, Magali
+ esburg\, 1791\, South Africa
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:Brewery & Distillery tours
+TRANSP:OPAQUE
+END:VEVENT
+END:VCALENDAR'), 'invite.ics');
+        $phpmailer->AltBody = 'Calendar Invite Text Version'; // Needed in order to include the ical part
+
+        $phpmailer->Ical = 'BEGIN:VCALENDAR
+PRODID:-//Google Inc//Google Calendar 70.9054//EN
+VERSION:2.0
+CALSCALE:GREGORIAN
+METHOD:REQUEST
+BEGIN:VEVENT
+DTSTART:20181229T120000Z
+DTEND:20181229T130000Z
+DTSTAMP:20181219T152216Z
+ORGANIZER;CN=Black Horse Brewery:mailto:p42g4ia1s85n2gm526qkrg80cs@group.ca
+ lendar.google.com
+UID:F8E65F33-AA5F-4313-A9A3-25339C7FE6A1
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=
+ TRUE;CN=marius@tripturbine.com;X-NUM-GUESTS=0:mailto:marius@tripturbine.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;RSVP=TRUE
+ ;CN=Black Horse Brewery;X-NUM-GUESTS=0:mailto:p42g4ia1s85n2gm526qkrg80cs@gr
+ oup.calendar.google.com
+URL:message:%3C1ca6be9ab3f8223f7e691f5373c7078f@blackhorsedistillery.co.za%
+ 3E
+CREATED:20181219T152157Z
+DESCRIPTION:Full tour x 2 Alfred Mukudu\n\n\n-::~:~::~:~:~:~:~:~:~:~:~:~:~:
+ ~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~::~:~::-\nPlease do not ed
+ it this section of the description.\n\nView your event at https://www.googl
+ e.com/calendar/event?action=VIEW&eid=XzhvczRhZGhsOG9wajZiYTE4NHFrY2I5azZjb2
+ o2YmExNzUwajZiOWk2a3BqNmVhMzZ0MzRhZGkxNjQgbWFyaXVzQHRyaXB0dXJiaW5lLmNvbQ&to
+ k=NTIjcDQyZzRpYTFzODVuMmdtNTI2cWtyZzgwY3NAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvb
+ TYzYjdkZDk0YTM3NDI2ZmFhYzRhNmM1YjRjZGYxNDVmMTQwZjhiZWU&ctz=Africa%2FJohanne
+ sburg&hl=en&es=1.\n-::~:~::~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:
+ ~:~:~:~:~:~:~:~:~:~:~:~::~:~::-
+LAST-MODIFIED:20181219T152214Z
+LOCATION:Black Horse Brewery\n32 Seekoeihoek / Bekker Schools Road\, Magali
+ esburg\, 1791\, South Africa
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:Brewery & Distillery tours
+TRANSP:OPAQUE
+END:VEVENT
+END:VCALENDAR
+';
     }
 
 }
