@@ -203,6 +203,18 @@ class Calendar_Invite_Admin {
             $this->plugin_name . '-basic',
             array(
                     'id'          => $this->plugin_name . '-date-format-options',
+                    'options'     => array('jS F Y', 'Y-m-d', 'm/d/Y', 'd/m/Y', '\c\u\s\t\o\m')
+            )
+        );
+
+        add_settings_field(
+            $this->plugin_name . '-date-format-custom',
+            'Custom Date Format',
+            array( $this, 'settings_format_custom_field' ),
+            $this->plugin_name . '-basic-settings-page',
+            $this->plugin_name . '-basic',
+            array(
+                'id'    => $this->plugin_name . '-date-format-custom',
             )
         );
 
@@ -226,9 +238,20 @@ class Calendar_Invite_Admin {
             $this->plugin_name . '-basic',
             array(
                 'id'          => $this->plugin_name . '-time-format-options',
+                'options'     => array('g:i a', 'g:i A', 'H:i', '\c\u\s\t\o\m')
             )
         );
 
+        add_settings_field(
+            $this->plugin_name . '-time-format-custom',
+            'Custom Date Format',
+            array( $this, 'settings_format_custom_field' ),
+            $this->plugin_name . '-basic-settings-page',
+            $this->plugin_name . '-basic',
+            array(
+                'id'    => $this->plugin_name . '-date-format-custom',
+            )
+        );
 
     }
 
@@ -259,7 +282,6 @@ class Calendar_Invite_Admin {
 
     public function settings_radio_field($args = array()) {
         $defaults = array(
-            'class'         => 'regular-text',
             'description'   => '',
             'label'         => '',
             'name'          => $this->plugin_name . '-options[' . $args['id'] . ']',
@@ -276,6 +298,10 @@ class Calendar_Invite_Admin {
         }
 
         include( plugin_dir_path( __FILE__ ) . 'partials/' . $this->plugin_name . '-admin-field-radio.php' );
+    }
+
+    public function settings_format_custom_field($args = array()) {
+        include( plugin_dir_path( __FILE__ ) . 'partials/' . $this->plugin_name . '-admin-field-custom-format.php' );
     }
 
     /**

@@ -6,3 +6,8 @@
 .widefat .column-wc_actions a.invite::after {
     content: '\1f4c5';
 }
+
+.settings_page_calendar-invite .date-time-text {
+    min-width: 10em;
+    display: inline-block;
+}
