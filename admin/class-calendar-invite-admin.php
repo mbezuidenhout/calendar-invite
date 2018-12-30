@@ -196,6 +196,17 @@ class Calendar_Invite_Admin {
         );
 
         add_settings_field(
+            $this->plugin_name . '-date-format-options',
+            'Date Format',
+            array( $this, 'settings_radio_field' ),
+            $this->plugin_name . '-basic-settings-page',
+            $this->plugin_name . '-basic',
+            array(
+                    'id'          => $this->plugin_name . '-date-format-options',
+            )
+        );
+
+        add_settings_field(
             $this->plugin_name . '-time-field',
             'Time Field',
             array( $this, 'settings_text_field' ),
@@ -206,6 +217,19 @@ class Calendar_Invite_Admin {
                     'description' => 'The order item meta data field to search for',
                     'value'       => ''
             ));
+
+        add_settings_field(
+            $this->plugin_name . '-time-format-options',
+            'Time Format',
+            array( $this, 'settings_radio_field' ),
+            $this->plugin_name . '-basic-settings-page',
+            $this->plugin_name . '-basic',
+            array(
+                'id'          => $this->plugin_name . '-time-format-options',
+            )
+        );
+
+
     }
 
     public function settings_section_basic( $params ) {
@@ -214,7 +238,7 @@ class Calendar_Invite_Admin {
 
     public function settings_text_field($args = array()) {
         $defaults = array(
-                'class'         => 'text widefat',
+                'class'         => 'regular-text',
                 'description'   => '',
                 'label'         => '',
                 'name'          => $this->plugin_name . '-options[' . $args['id'] . ']',
@@ -231,6 +255,27 @@ class Calendar_Invite_Admin {
         }
 
         include( plugin_dir_path( __FILE__ ) . 'partials/' . $this->plugin_name . '-admin-field-text.php' );
+    }
+
+    public function settings_radio_field($args = array()) {
+        $defaults = array(
+            'class'         => 'regular-text',
+            'description'   => '',
+            'label'         => '',
+            'name'          => $this->plugin_name . '-options[' . $args['id'] . ']',
+            'placeholder'   => '',
+            'type'          => 'radio',
+            'value'         => '',
+            'attribute'     => '',
+        );
+        apply_filters( $this->plugin_name . 'field-radio-options-defaults', $defaults );
+        $atts = wp_parse_args( $args, $defaults );
+
+        if( ! empty( $this->options[$atts['id']])) {
+            $atts['value'] = $this->options[$atts['id']];
+        }
+
+        include( plugin_dir_path( __FILE__ ) . 'partials/' . $this->plugin_name . '-admin-field-radio.php' );
     }
 
     /**

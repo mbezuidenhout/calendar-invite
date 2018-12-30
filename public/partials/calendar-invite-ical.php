@@ -12,6 +12,8 @@
  * @package     Calendar_Invite
  * @subpackage  Calendar_Invite/public/partials
  */
+
+/** @var \Calendar_Invite_Calendar_Data $calendar_invite_data */
 ?>
 BEGIN:VCALENDAR
 PRODID:-//Marius Bezuidenhout//Calendar Invite <?php echo $this->get_version() ?>//EN
@@ -20,15 +22,15 @@ CALSCALE:GREGORIAN
 METHOD:PUBLISH
 BEGIN:VEVENT
 ORGANIZER:MAILTO:<?php echo get_option('admin_email') ?>
-DTSTART:<?php echo $dtstart ?>
-DTEND:<?php echo $dtend ?>
-LOCATION:<?php echo $dtlocation ?>
+DTSTART:<?php echo $calendar_invite_data->get_event_dtstart() ?>
+DTEND:<?php echo $calendar_invite_data->get_event_dtend() ?>
+LOCATION:<?php echo $calendar_invite_data->get_place() ?>
 TRANSP:OPAQUE
 SEQUENCE:0
-UID:<?php echo $eventuid ?>
+UID:<?php echo $calendar_invite_data->get_uid() ?>
 DTSTAMP:<?php echo $todaystamp ?>
-DESCRIPTION:<?php echo $description ?>
-SUMMARY:<?php echo $subject ?>
+DESCRIPTION:<?php echo $calendar_invite_data->get_description() ?>
+SUMMARY:<?php echo $calendar_invite_data->get_subject() ?>
 PRIORITY:5
 CLASS:PUBLIC
 END:VEVENT

@@ -318,9 +318,16 @@ class Calendar_Invite {
 
             if(!empty($date) && !empty($time)) {
                 // Send e-mail with ical invite
+                $locale = get_locale();
                 $customer = new WC_Customer($order->get_customer_id());
-                $dtstart = strtotime($date . ' ' . $time);
-                $eventuid = md5($order_id . '-' . $item->get_name() . '-' . $order->get_customer_id() . '-' . $date . '-' . $time);
+
+                $calendar_invite_data = new Calendar_Invite_Calendar_Data();
+                $calendar_invite_data->set_subject($item->get_name())
+                    ->set_event_start(DateTime::createFromFormat($date . ' ' . $time, get_option('date_format') . ' ' . get_option('time_format')))
+                    ->set_event_end(DateTime::createFromFormat($date . ' ' . $time, get_option('date_format') . ' ' . get_option('time_format')))
+                    ->set_place('')
+                    ->set_description('')
+                    ->set_uid(md5($order_id . '-' . $item->get_name() . '-' . $order->get_customer_id() . '-' . $date . '-' . $time));
 
                 // Set the correct headers for this file
                 ob_start();
@@ -332,9 +339,16 @@ class Calendar_Invite {
                 // Set content-type
                 // Set own boundary
 
-                $message = 'Calendar Invite HTML version';
+                ob_start();
+                /* @see ../public/partials/calendar-invite-mail.php */
+                include(plugin_dir_path( dirname( __FILE__ ) ) . 'public/partials/calendar-invite-mail-html.php');
+                //Collect output and echo
+                $html_invite = ob_get_contents();
+                ob_end_clean();
 
-                wp_mail($customer->get_email(), $item->get_name(),  $message);
+                $html_invite = '<!-- ' . $this->plugin_name . ' ' . serialize($calendar_invite_data) . ' -->' . $html_invite;
+
+                wp_mail($customer->get_email(), $item->get_name(),  $html_invite);
             }
 
         }
@@ -364,86 +378,30 @@ class Calendar_Invite {
      * @param $phpmailer \Calendar_Invite_Mailer
      */
     public function add_ical_mail_parts(\Calendar_Invite_Mailer $phpmailer) {
-        $phpmailer->addStringAttachment(base64_encode('BEGIN:VCALENDAR
-PRODID:-//Google Inc//Google Calendar 70.9054//EN
-VERSION:2.0
-CALSCALE:GREGORIAN
-METHOD:REQUEST
-BEGIN:VEVENT
-DTSTART:20181229T120000Z
-DTEND:20181229T130000Z
-DTSTAMP:20181219T152216Z
-ORGANIZER;CN=Black Horse Brewery:mailto:p42g4ia1s85n2gm526qkrg80cs@group.ca
- lendar.google.com
-UID:F8E65F33-AA5F-4313-A9A3-25339C7FE6A1
-ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=
- TRUE;CN=marius@tripturbine.com;X-NUM-GUESTS=0:mailto:marius@tripturbine.com
-ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;RSVP=TRUE
- ;CN=Black Horse Brewery;X-NUM-GUESTS=0:mailto:p42g4ia1s85n2gm526qkrg80cs@gr
- oup.calendar.google.com
-URL:message:%3C1ca6be9ab3f8223f7e691f5373c7078f@blackhorsedistillery.co.za%
- 3E
-CREATED:20181219T152157Z
-DESCRIPTION:Full tour x 2 Alfred Mukudu\n\n\n-::~:~::~:~:~:~:~:~:~:~:~:~:~:
- ~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~::~:~::-\nPlease do not ed
- it this section of the description.\n\nView your event at https://www.googl
- e.com/calendar/event?action=VIEW&eid=XzhvczRhZGhsOG9wajZiYTE4NHFrY2I5azZjb2
- o2YmExNzUwajZiOWk2a3BqNmVhMzZ0MzRhZGkxNjQgbWFyaXVzQHRyaXB0dXJiaW5lLmNvbQ&to
- k=NTIjcDQyZzRpYTFzODVuMmdtNTI2cWtyZzgwY3NAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvb
- TYzYjdkZDk0YTM3NDI2ZmFhYzRhNmM1YjRjZGYxNDVmMTQwZjhiZWU&ctz=Africa%2FJohanne
- sburg&hl=en&es=1.\n-::~:~::~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:
- ~:~:~:~:~:~:~:~:~:~:~:~::~:~::-
-LAST-MODIFIED:20181219T152214Z
-LOCATION:Black Horse Brewery\n32 Seekoeihoek / Bekker Schools Road\, Magali
- esburg\, 1791\, South Africa
-SEQUENCE:0
-STATUS:CONFIRMED
-SUMMARY:Brewery & Distillery tours
-TRANSP:OPAQUE
-END:VEVENT
-END:VCALENDAR'), 'invite.ics');
-        $phpmailer->AltBody = 'Calendar Invite Text Version'; // Needed in order to include the ical part
+        $body = $phpmailer->Body;
 
-        $phpmailer->Ical = 'BEGIN:VCALENDAR
-PRODID:-//Google Inc//Google Calendar 70.9054//EN
-VERSION:2.0
-CALSCALE:GREGORIAN
-METHOD:REQUEST
-BEGIN:VEVENT
-DTSTART:20181229T120000Z
-DTEND:20181229T130000Z
-DTSTAMP:20181219T152216Z
-ORGANIZER;CN=Black Horse Brewery:mailto:p42g4ia1s85n2gm526qkrg80cs@group.ca
- lendar.google.com
-UID:F8E65F33-AA5F-4313-A9A3-25339C7FE6A1
-ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=
- TRUE;CN=marius@tripturbine.com;X-NUM-GUESTS=0:mailto:marius@tripturbine.com
-ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;RSVP=TRUE
- ;CN=Black Horse Brewery;X-NUM-GUESTS=0:mailto:p42g4ia1s85n2gm526qkrg80cs@gr
- oup.calendar.google.com
-URL:message:%3C1ca6be9ab3f8223f7e691f5373c7078f@blackhorsedistillery.co.za%
- 3E
-CREATED:20181219T152157Z
-DESCRIPTION:Full tour x 2 Alfred Mukudu\n\n\n-::~:~::~:~:~:~:~:~:~:~:~:~:~:
- ~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~::~:~::-\nPlease do not ed
- it this section of the description.\n\nView your event at https://www.googl
- e.com/calendar/event?action=VIEW&eid=XzhvczRhZGhsOG9wajZiYTE4NHFrY2I5azZjb2
- o2YmExNzUwajZiOWk2a3BqNmVhMzZ0MzRhZGkxNjQgbWFyaXVzQHRyaXB0dXJiaW5lLmNvbQ&to
- k=NTIjcDQyZzRpYTFzODVuMmdtNTI2cWtyZzgwY3NAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvb
- TYzYjdkZDk0YTM3NDI2ZmFhYzRhNmM1YjRjZGYxNDVmMTQwZjhiZWU&ctz=Africa%2FJohanne
- sburg&hl=en&es=1.\n-::~:~::~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:
- ~:~:~:~:~:~:~:~:~:~:~:~::~:~::-
-LAST-MODIFIED:20181219T152214Z
-LOCATION:Black Horse Brewery\n32 Seekoeihoek / Bekker Schools Road\, Magali
- esburg\, 1791\, South Africa
-SEQUENCE:0
-STATUS:CONFIRMED
-SUMMARY:Brewery & Distillery tours
-TRANSP:OPAQUE
-END:VEVENT
-END:VCALENDAR
-';
-        $phpmailer = '';
+        $var_string_start_pos = strpos( $body, '<!-- ' . $this->plugin_name . ' ') + strlen('<!-- ' . $this->plugin_name . ' ');
+
+        $calendar_invite_data = unserialize(substr( $body, $var_string_start_pos, strpos( $body, ' -->', $var_string_start_pos) ));
+
+        ob_start();
+        /* @see ../public/partials/calendar-invite-ical.php */
+        include(plugin_dir_path( dirname( __FILE__ ) ) . 'public/partials/calendar-invite-ical.php');
+        //Collect output and echo
+        $ical = ob_get_contents();
+        ob_end_clean();
+
+        $phpmailer->addStringAttachment(base64_encode($ical), 'invite.ics');
+        ob_start();
+        /* @see ../public/partials/calendar-invite-ical.php */
+        include(plugin_dir_path( dirname( __FILE__ ) ) . 'public/partials/calendar-invite-mail-text.php');
+        //Collect output and echo
+        $text_invite = ob_get_contents();
+        ob_end_clean();
+
+        $phpmailer->AltBody = $text_invite; // Needed in order to include the ical part
+
+        $phpmailer->Ical = $ical;
     }
 
 }

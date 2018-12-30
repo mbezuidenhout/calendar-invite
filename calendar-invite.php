@@ -63,6 +63,7 @@ register_deactivation_hook( __FILE__, 'deactivate_calendar_invite' );
  * admin-specific hooks, and public-facing site hooks.
  */
 require plugin_dir_path( __FILE__ ) . 'includes/class-calendar-invite.php';
+require_once plugin_dir_path( __FILE__ ) . 'includes/class-calendar-invite-calendar-data.php';
 
 /**
  * Begins execution of the plugin.
