@@ -28,7 +28,7 @@ LOCATION:<?php echo $calendar_invite_data->get_place() ?>
 TRANSP:OPAQUE
 SEQUENCE:0
 UID:<?php echo $calendar_invite_data->get_uid() ?>
-DTSTAMP:<?php echo $todaystamp ?>
+DTSTAMP:<?php echo $calendar_invite_data->get_dtstamp() ?>
 DESCRIPTION:<?php echo $calendar_invite_data->get_description() ?>
 SUMMARY:<?php echo $calendar_invite_data->get_subject() ?>
 PRIORITY:5

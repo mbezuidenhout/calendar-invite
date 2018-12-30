@@ -191,7 +191,7 @@ class Calendar_Invite_Admin {
             array(
                 'id'          => $this->plugin_name . '-date-field',
                 'description' => 'The order item meta data field to search for',
-                'value'       => ''
+                'value'       => 'Y-m-d'
             )
         );
 
@@ -207,7 +207,7 @@ class Calendar_Invite_Admin {
             )
         );
 
-        add_settings_field(
+/*        add_settings_field(
             $this->plugin_name . '-date-format-custom',
             'Custom Date Format',
             array( $this, 'settings_format_custom_field' ),
@@ -216,7 +216,7 @@ class Calendar_Invite_Admin {
             array(
                 'id'    => $this->plugin_name . '-date-format-custom',
             )
-        );
+        );*/
 
         add_settings_field(
             $this->plugin_name . '-time-field',
@@ -227,7 +227,7 @@ class Calendar_Invite_Admin {
             array(
                     'id'          => $this->plugin_name . '-time-field',
                     'description' => 'The order item meta data field to search for',
-                    'value'       => ''
+                    'value'       => 'H:i'
             ));
 
         add_settings_field(
@@ -242,16 +242,16 @@ class Calendar_Invite_Admin {
             )
         );
 
-        add_settings_field(
+/*        add_settings_field(
             $this->plugin_name . '-time-format-custom',
-            'Custom Date Format',
+            'Custom Time Format',
             array( $this, 'settings_format_custom_field' ),
             $this->plugin_name . '-basic-settings-page',
             $this->plugin_name . '-basic',
             array(
-                'id'    => $this->plugin_name . '-date-format-custom',
+                'id'    => $this->plugin_name . '-time-format-custom',
             )
-        );
+        );*/
 
     }
 
@@ -295,6 +295,9 @@ class Calendar_Invite_Admin {
 
         if( ! empty( $this->options[$atts['id']])) {
             $atts['value'] = $this->options[$atts['id']];
+        }
+        if( !empty ($this->options[$atts['id'] . '-custom'])) {
+            $atts['custom-value'] = $this->options[$atts['id'] . '-custom'];
         }
 
         include( plugin_dir_path( __FILE__ ) . 'partials/' . $this->plugin_name . '-admin-field-radio.php' );

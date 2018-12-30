@@ -25,12 +25,12 @@ class Calendar_Invite_Calendar_Data {
         return $this;
     }
 
-    public function set_event_start($start_date_time) {
+    public function set_event_start(\DateTime $start_date_time) {
         $this->start = $start_date_time;
         return $this;
     }
 
-    public function set_event_end($end_date_time) {
+    public function set_event_end(\DateTime $end_date_time) {
         $this->end = $end_date_time;
         return $this;
     }
@@ -80,5 +80,10 @@ class Calendar_Invite_Calendar_Data {
 
     public function get_uid() {
         return $this->uid;
+    }
+
+    public function get_dtstamp() {
+        $now = new DateTime;
+        return $now;
     }
 }

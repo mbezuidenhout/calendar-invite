@@ -318,13 +318,18 @@ class Calendar_Invite {
 
             if(!empty($date) && !empty($time)) {
                 // Send e-mail with ical invite
-                $locale = get_locale();
+                // $locale = get_locale();
                 $customer = new WC_Customer($order->get_customer_id());
+                $event_start = DateTime::createFromFormat($date . ' ' . $time, $this->options[$this->plugin_name . '-date-format-options'] . ' ' . $this->options[$this->plugin_name . '-time-format-options']);
+                $event_end = DateTime::createFromFormat($date . ' ' . $time, $this->options[$this->plugin_name . '-date-format-options'] . ' ' . $this->options[$this->plugin_name . '-time-format-options']);
+
+                if($event_start->diff($event_end)->format('s') == 0)
+                    $event_end->add(DateInterval::createFromDateString('1 hour'));
 
                 $calendar_invite_data = new Calendar_Invite_Calendar_Data();
                 $calendar_invite_data->set_subject($item->get_name())
-                    ->set_event_start(DateTime::createFromFormat($date . ' ' . $time, get_option('date_format') . ' ' . get_option('time_format')))
-                    ->set_event_end(DateTime::createFromFormat($date . ' ' . $time, get_option('date_format') . ' ' . get_option('time_format')))
+                    ->set_event_start($event_start)
+                    ->set_event_end($event_end)
                     ->set_place('')
                     ->set_description('')
                     ->set_uid(md5($order_id . '-' . $item->get_name() . '-' . $order->get_customer_id() . '-' . $date . '-' . $time));
