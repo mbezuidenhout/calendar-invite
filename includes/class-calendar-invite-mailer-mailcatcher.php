@@ -93,7 +93,7 @@ class Calendar_Invite_Mailer extends \WPMailSMTP\MailCatcher {
                 if (!empty($this->Ical)) {
                     $body .= $this->getBoundary($this->boundary[1], '', 'text/calendar; method=REQUEST', '');
                     $body .= $this->encodeString($this->Ical, $this->Encoding);
-                    $body .= $this->LE . $this->LE;
+                    $body .= $this->LE;
                 }
                 $body .= $this->endBoundary($this->boundary[1]);
                 break;
@@ -130,7 +130,7 @@ class Calendar_Invite_Mailer extends \WPMailSMTP\MailCatcher {
                 if (!empty($this->Ical)) {
                     $body .= $this->getBoundary($this->boundary[1], '', 'text/calendar; method=REQUEST', '');
                     $body .= $this->encodeString($this->Ical, $this->Encoding);
-                    $body .= $this->LE . $this->LE;
+                    $body .= $this->LE;
                 }
                 $body .= $this->attachAll('attachment', $this->boundary[1]);
                 break;

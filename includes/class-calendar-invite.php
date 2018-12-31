@@ -320,14 +320,14 @@ class Calendar_Invite {
                 // Send e-mail with ical invite
                 // $locale = get_locale();
                 $customer = new WC_Customer($order->get_customer_id());
-                $event_start = DateTime::createFromFormat($date . ' ' . $time, $this->options[$this->plugin_name . '-date-format-options'] . ' ' . $this->options[$this->plugin_name . '-time-format-options']);
-                $event_end = DateTime::createFromFormat($date . ' ' . $time, $this->options[$this->plugin_name . '-date-format-options'] . ' ' . $this->options[$this->plugin_name . '-time-format-options']);
+                $event_start = DateTime::createFromFormat($this->options[$this->plugin_name . '-date-format-options'] . ' ' . $this->options[$this->plugin_name . '-time-format-options'], $date . ' ' . $time, new DateTimeZone(get_option('timezone_string')));
+                $event_end = DateTime::createFromFormat($this->options[$this->plugin_name . '-date-format-options'] . ' ' . $this->options[$this->plugin_name . '-time-format-options'], $date . ' ' . $time, new DateTimeZone(get_option('timezone_string')));
 
-                if($event_start->diff($event_end)->format('s') == 0)
+                if($event_start instanceof DateTime && $event_end instanceof DateTime && $event_start->diff($event_end)->format('s') == 0)
                     $event_end->add(DateInterval::createFromDateString('1 hour'));
 
                 $calendar_invite_data = new Calendar_Invite_Calendar_Data();
-                $calendar_invite_data->set_subject($item->get_name())
+                $calendar_invite_data->set_subject(html_entity_decode($item->get_name()))
                     ->set_event_start($event_start)
                     ->set_event_end($event_end)
                     ->set_place('')
@@ -396,7 +396,7 @@ class Calendar_Invite {
         $ical = ob_get_contents();
         ob_end_clean();
 
-        $phpmailer->addStringAttachment(base64_encode($ical), 'invite.ics');
+        $phpmailer->addStringAttachment($ical, 'invite.ics', 'base64', 'application/ics');
         ob_start();
         /* @see ../public/partials/calendar-invite-ical.php */
         include(plugin_dir_path( dirname( __FILE__ ) ) . 'public/partials/calendar-invite-mail-text.php');

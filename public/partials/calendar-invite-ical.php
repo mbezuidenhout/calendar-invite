@@ -21,16 +21,16 @@ VERSION:2.0
 CALSCALE:GREGORIAN
 METHOD:PUBLISH
 BEGIN:VEVENT
-ORGANIZER:MAILTO:<?php echo get_option('admin_email') ?>
-DTSTART:<?php echo $calendar_invite_data->get_event_dtstart() ?>
-DTEND:<?php echo $calendar_invite_data->get_event_dtend() ?>
-LOCATION:<?php echo $calendar_invite_data->get_place() ?>
+ORGANIZER:MAILTO:<?php echo get_option('admin_email') . "\n" ?>
+DTSTART:<?php echo $calendar_invite_data->get_event_dtstart() . "\n" ?>
+DTEND:<?php echo $calendar_invite_data->get_event_dtend() . "\n" ?>
+LOCATION:<?php echo $calendar_invite_data->get_place() . "\n" ?>
 TRANSP:OPAQUE
 SEQUENCE:0
-UID:<?php echo $calendar_invite_data->get_uid() ?>
-DTSTAMP:<?php echo $calendar_invite_data->get_dtstamp() ?>
-DESCRIPTION:<?php echo $calendar_invite_data->get_description() ?>
-SUMMARY:<?php echo $calendar_invite_data->get_subject() ?>
+UID:<?php echo $calendar_invite_data->get_uid() . "\n" ?>
+DTSTAMP:<?php echo $calendar_invite_data->get_dtstamp() . "\n" ?>
+DESCRIPTION:<?php echo $calendar_invite_data->get_description() . "\n" ?>
+SUMMARY:<?php echo $calendar_invite_data->get_subject() . "\n" ?>
 PRIORITY:5
 CLASS:PUBLIC
 END:VEVENT

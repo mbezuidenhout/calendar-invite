@@ -20,6 +20,18 @@ class Calendar_Invite_Calendar_Data {
     /** @var string */
     protected $uid;
 
+    protected $timezone;
+
+    private $ical_time_format;
+
+    private $ical_timezone;
+
+    public function __construct() {
+        $this->timezone = get_option('timezone_string');
+        $this->ical_time_format = 'Ymd\THis\Z';
+        $this->ical_timezone = 'UTC';
+    }
+
     public function set_subject($subject) {
         $this->subject = $subject;
         return $this;
@@ -55,7 +67,9 @@ class Calendar_Invite_Calendar_Data {
     }
 
     public function get_event_dtstart() {
-        return $this->start;
+        $dtstart = $this->start;
+        $dtstart->setTimezone(new DateTimeZone($this->ical_timezone));
+        return $dtstart->format($this->ical_time_format);
     }
 
     public function get_event_start() {
@@ -63,7 +77,9 @@ class Calendar_Invite_Calendar_Data {
     }
 
     public function get_event_dtend() {
-        return $this->end;
+        $dtend = $this->end;
+        $dtend->setTimezone(new DateTimeZone($this->ical_timezone));
+        return $dtend->format($this->ical_time_format);
     }
 
     public function get_event_end() {
@@ -83,7 +99,8 @@ class Calendar_Invite_Calendar_Data {
     }
 
     public function get_dtstamp() {
-        $now = new DateTime;
-        return $now;
+        $now = new DateTime('now', new DateTimeZone($this->timezone));
+        $now->setTimezone(new DateTimeZone($this->ical_timezone));
+        return $now->format($this->ical_time_format);
     }
 }
