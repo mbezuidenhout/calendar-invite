@@ -18,7 +18,7 @@
 <table class="form-table">
     <tbody><tr class="user-send-invites-wrap">
         <th scope="row">Calendar Invites</th>
-        <td><label for="account_email_invites"><input type="checkbox" name="account_email_invites" id="account_email_invites" value="1" <?php echo $user->email_invites?"checked=\"checked\"":""; ?>> Send calendar invites via Email</label>
+        <td><label for="account_email_invites"><input type="checkbox" name="account_email_invites" id="account_email_invites" value="1" <?php echo ($user->email_invites != 'false')?"checked=\"checked\"":""; ?>> Send calendar invites via Email</label>
         </td>
     </tr>
     </tbody></table>

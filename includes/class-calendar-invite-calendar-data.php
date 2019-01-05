@@ -20,10 +20,16 @@ class Calendar_Invite_Calendar_Data {
     /** @var string */
     protected $uid;
 
+    /** @var string */
+    protected $organizer_email;
+
+    /** @var string */
     protected $timezone;
 
+    /** @var string */
     private $ical_time_format;
 
+    /** @var string */
     private $ical_timezone;
 
     public function __construct() {
@@ -32,6 +38,12 @@ class Calendar_Invite_Calendar_Data {
         $this->ical_timezone = 'UTC';
     }
 
+    /**
+     * Set event subject
+     *
+     * @param $subject
+     * @return $this
+     */
     public function set_subject($subject) {
         $this->subject = $subject;
         return $this;
@@ -59,6 +71,11 @@ class Calendar_Invite_Calendar_Data {
 
     public function set_uid($uid) {
         $this->uid = $uid;
+        return $this;
+    }
+
+    public function set_organizer_email($email) {
+        $this->organizer_email = $email;
         return $this;
     }
 
@@ -102,5 +119,9 @@ class Calendar_Invite_Calendar_Data {
         $now = new DateTime('now', new DateTimeZone($this->timezone));
         $now->setTimezone(new DateTimeZone($this->ical_timezone));
         return $now->format($this->ical_time_format);
+    }
+
+    public function get_organizer_email() {
+        return $this->organizer_email;
     }
 }

@@ -274,11 +274,18 @@ class Calendar_Invite {
         if ( !current_user_can( 'edit_user', $user_id ) ) {
             return false;
         }
-        if ( ! empty( $_POST['account_email_invites'] ) ) {
+        if ( empty( $_POST['account_email_invites'] )) {
             $_POST['account_email_invites'] = (int) isset( $_POST['account_email_invites'] ); // Sanitize field
-            add_user_meta( $user_id, 'email_invites', 'true');
-        } else
-            delete_user_meta( $user_id, 'email_invites');
+            if(get_user_option('email_invites'))
+                update_user_option( $user_id, 'email_invites', 'true');
+            else
+                add_user_meta( $user_id, 'email_invites', 'true');
+        } else {
+            if(get_user_option('email_invites'))
+                update_user_option( $user_id, 'email_invites', 'false');
+            else
+                add_user_meta( $user_id, 'email_invites', 'false');
+        }
     }
 
     /**
@@ -320,6 +327,7 @@ class Calendar_Invite {
                 // Send e-mail with ical invite
                 // $locale = get_locale();
                 $customer = new WC_Customer($order->get_customer_id());
+                $user = get_user_by( 'login', $customer->get_username());
                 $event_start = DateTime::createFromFormat($this->options[$this->plugin_name . '-date-format-options'] . ' ' . $this->options[$this->plugin_name . '-time-format-options'], $date . ' ' . $time, new DateTimeZone(get_option('timezone_string')));
                 $event_end = DateTime::createFromFormat($this->options[$this->plugin_name . '-date-format-options'] . ' ' . $this->options[$this->plugin_name . '-time-format-options'], $date . ' ' . $time, new DateTimeZone(get_option('timezone_string')));
 
@@ -328,21 +336,12 @@ class Calendar_Invite {
 
                 $calendar_invite_data = new Calendar_Invite_Calendar_Data();
                 $calendar_invite_data->set_subject(html_entity_decode($item->get_name()))
+                    ->set_organizer_email(get_option('admin_email'))
                     ->set_event_start($event_start)
                     ->set_event_end($event_end)
                     ->set_place('')
                     ->set_description('')
                     ->set_uid(md5($order_id . '-' . $item->get_name() . '-' . $order->get_customer_id() . '-' . $date . '-' . $time));
-
-                // Set the correct headers for this file
-                ob_start();
-                /* @see ../public/partials/calendar-invite-ical.php */
-                include(plugin_dir_path( dirname( __FILE__ ) ) . 'public/partials/calendar-invite-ical.php');
-                //Collect output and echo
-                $ical = ob_get_contents();
-                ob_end_clean();
-                // Set content-type
-                // Set own boundary
 
                 ob_start();
                 /* @see ../public/partials/calendar-invite-mail.php */
@@ -353,7 +352,12 @@ class Calendar_Invite {
 
                 $html_invite = '<!-- ' . $this->plugin_name . ' ' . serialize($calendar_invite_data) . ' -->' . $html_invite;
 
-                wp_mail($customer->get_email(), $item->get_name(),  $html_invite);
+                if($user->email_invites != 'false') {
+                    wp_mail($customer->get_email(), html_entity_decode($item->get_name()), $html_invite);
+                }
+
+                wp_mail($calendar_invite_data->get_organizer_email(), html_entity_decode($item->get_name()), $html_invite);
+
             }
 
         }

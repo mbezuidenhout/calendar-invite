@@ -15,7 +15,7 @@
 
 <p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
     <label class="woocommerce-form__label woocommerce-form__label-for-checkbox" for="account_email_invites">
-        <input type="checkbox" class="woocommerce-Checkbox woocommerce-Input--checkbox input-checkbox" name="account_email_invites" id="account_email_invites" value="1" <?php echo $user->email_invites?"checked=\"checked\"":""; ?> />
+        <input type="checkbox" class="woocommerce-Checkbox woocommerce-Input--checkbox input-checkbox" name="account_email_invites" id="account_email_invites" value="1" <?php echo ($user->email_invites != 'false')?"checked=\"checked\"":""; ?> />
         <?php esc_html_e( 'Send calendar invites via Email', 'calendar-invite' ); ?>
     </label>
 </p>

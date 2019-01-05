@@ -21,7 +21,7 @@ VERSION:2.0
 CALSCALE:GREGORIAN
 METHOD:PUBLISH
 BEGIN:VEVENT
-ORGANIZER:MAILTO:<?php echo get_option('admin_email') . "\n" ?>
+ORGANIZER:MAILTO:<?php echo $calendar_invite_data->get_organizer_email() . "\n" ?>
 DTSTART:<?php echo $calendar_invite_data->get_event_dtstart() . "\n" ?>
 DTEND:<?php echo $calendar_invite_data->get_event_dtend() . "\n" ?>
 LOCATION:<?php echo $calendar_invite_data->get_place() . "\n" ?>
