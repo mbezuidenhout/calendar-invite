@@ -276,15 +276,15 @@ class Calendar_Invite {
         }
         if ( empty( $_POST['account_email_invites'] )) {
             $_POST['account_email_invites'] = (int) isset( $_POST['account_email_invites'] ); // Sanitize field
-            if(get_user_option('email_invites'))
-                update_user_option( $user_id, 'email_invites', 'true');
-            else
-                add_user_meta( $user_id, 'email_invites', 'true');
-        } else {
-            if(get_user_option('email_invites'))
-                update_user_option( $user_id, 'email_invites', 'false');
+            if(get_user_meta( $user_id, 'email_invites'))
+                update_user_meta( $user_id, 'email_invites', 'false');
             else
                 add_user_meta( $user_id, 'email_invites', 'false');
+        } else {
+            if(get_user_meta( $user_id, 'email_invites'))
+                update_user_meta( $user_id, 'email_invites', 'true');
+            else
+                add_user_meta( $user_id, 'email_invites', 'true');
         }
     }
 
