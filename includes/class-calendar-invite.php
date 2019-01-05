@@ -343,7 +343,9 @@ class Calendar_Invite {
                     ->set_event_start($event_start)
                     ->set_event_end($event_end)
                     ->set_place('')
-                    ->set_description("Order nr.: " . $order->get_order_number() . "\n" . "Quantity: " . $item->get_quantity())
+                    ->set_description( "Customer name: " . $customer->get_first_name() . " " . $customer->get_last_name() . "\n " .
+                        "Order nr.: " . $order->get_order_number() . "\n" .
+                        "Quantity: " . $item->get_quantity())
                     ->set_uid(md5($order_id . '-' . $item->get_name() . '-' . $order->get_customer_id() . '-' . $date . '-' . $time));
 
                 ob_start();
