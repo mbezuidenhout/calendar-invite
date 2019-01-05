@@ -296,11 +296,14 @@ class Calendar_Invite {
     }
 
     public function send_calendar_invites_ajax() {
-        if(empty($_REQUEST['order_id']))
-            return 'Error obtaining order_id is REQUEST variables';
-        $order_id = $_REQUEST['order_id'];
-        $this->send_calendar_invites($order_id);
-        wp_die();
+        if ( wp_verify_nonce( $_REQUEST['nonce'], "my_user_vote_nonce")) {
+            if(empty($_REQUEST['order_id'])) {
+                return 'Error obtaining order_id is REQUEST variables';
+            }
+            $order_id = $_REQUEST['order_id'];
+            $this->send_calendar_invites($order_id);
+            wp_die();
+        }
     }
 
     public function send_calendar_invites($order_id) {
@@ -340,7 +343,7 @@ class Calendar_Invite {
                     ->set_event_start($event_start)
                     ->set_event_end($event_end)
                     ->set_place('')
-                    ->set_description('')
+                    ->set_description("Order nr.: " . $order->get_order_number() . "\n" . "Quantity: " . $item->get_quantity())
                     ->set_uid(md5($order_id . '-' . $item->get_name() . '-' . $order->get_customer_id() . '-' . $date . '-' . $time));
 
                 ob_start();

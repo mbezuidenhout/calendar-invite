@@ -124,4 +124,8 @@ class Calendar_Invite_Calendar_Data {
     public function get_organizer_email() {
         return $this->organizer_email;
     }
+
+    public function get_timezone_string() {
+        return $this->timezone;
+    }
 }
