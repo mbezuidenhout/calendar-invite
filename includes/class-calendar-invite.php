@@ -296,17 +296,19 @@ class Calendar_Invite {
     }
 
     public function send_calendar_invites_ajax() {
-        if ( wp_verify_nonce( $_REQUEST['nonce'], "my_user_vote_nonce")) {
+        if ( wp_verify_nonce( $_REQUEST['nonce'], "calendar-invite-send-invite")) {
             if(empty($_REQUEST['order_id'])) {
                 return 'Error obtaining order_id is REQUEST variables';
             }
             $order_id = $_REQUEST['order_id'];
-            $this->send_calendar_invites($order_id);
-            wp_die();
+            $message = $this->send_calendar_invites($order_id);
+            echo json_encode(array('type' => 'success', 'message' => 'Order #' . $order_id . ' invite successfully sent to ' . $message));
+            die();
         }
     }
 
     public function send_calendar_invites($order_id) {
+        $message = '';
         $order = new WC_Order($order_id);
         $order_items = $order->get_items();
 
@@ -358,15 +360,17 @@ class Calendar_Invite {
                 $html_invite = '<!-- ' . $this->plugin_name . ' ' . serialize($calendar_invite_data) . ' -->' . $html_invite;
 
                 if($user->email_invites != 'false') {
-                    wp_mail($customer->get_email(), html_entity_decode($item->get_name()), $html_invite);
+                    if(wp_mail($customer->get_email(), html_entity_decode($item->get_name()), $html_invite))
+                        $message = $customer->get_email();
                 }
 
-                wp_mail($calendar_invite_data->get_organizer_email(), html_entity_decode($item->get_name()), $html_invite);
+                if(wp_mail($calendar_invite_data->get_organizer_email(), html_entity_decode($item->get_name()), $html_invite))
+                    $message .= " and " . $calendar_invite_data->get_organizer_email();
 
             }
 
         }
-        return $order_id;
+        return $message;
     }
 
     public function set_custom_mailer() {
