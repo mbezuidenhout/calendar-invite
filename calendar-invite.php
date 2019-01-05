@@ -15,7 +15,7 @@
  * @wordpress-plugin
  * Plugin Name:       Calendar Invite
  * Plugin URI:        https://github.com/mbezuidenhout/calendar-invite.git
- * Description:       This is a short description of what the plugin does. It's displayed in the WordPress admin area.
+ * Description:       Sends the site admin a calendar invite.
  * Version:           1.0.0
  * Author:            Marius Bezuidenhout
  * Author URI:        https://tripturbine.com/

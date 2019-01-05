@@ -361,6 +361,7 @@ class Calendar_Invite {
             }
 
         }
+        return $order_id;
     }
 
     public function set_custom_mailer() {
@@ -393,24 +394,26 @@ class Calendar_Invite {
 
         $calendar_invite_data = unserialize(substr( $body, $var_string_start_pos, strpos( $body, ' -->', $var_string_start_pos) ));
 
-        ob_start();
-        /* @see ../public/partials/calendar-invite-ical.php */
-        include(plugin_dir_path( dirname( __FILE__ ) ) . 'public/partials/calendar-invite-ical.php');
-        //Collect output and echo
-        $ical = ob_get_contents();
-        ob_end_clean();
+        if(!empty($calendar_invite_data) && $calendar_invite_data instanceof Calendar_Invite_Calendar_Data) {
+            ob_start();
+            /* @see ../public/partials/calendar-invite-ical.php */
+            include(plugin_dir_path(dirname(__FILE__)) . 'public/partials/calendar-invite-ical.php');
+            //Collect output and echo
+            $ical = ob_get_contents();
+            ob_end_clean();
 
-        $phpmailer->addStringAttachment($ical, 'invite.ics', 'base64', 'application/ics');
-        ob_start();
-        /* @see ../public/partials/calendar-invite-ical.php */
-        include(plugin_dir_path( dirname( __FILE__ ) ) . 'public/partials/calendar-invite-mail-text.php');
-        //Collect output and echo
-        $text_invite = ob_get_contents();
-        ob_end_clean();
+            $phpmailer->addStringAttachment($ical, 'invite.ics', 'base64', 'application/ics');
+            ob_start();
+            /* @see ../public/partials/calendar-invite-ical.php */
+            include(plugin_dir_path(dirname(__FILE__)) . 'public/partials/calendar-invite-mail-text.php');
+            //Collect output and echo
+            $text_invite = ob_get_contents();
+            ob_end_clean();
 
-        $phpmailer->AltBody = $text_invite; // Needed in order to include the ical part
+            $phpmailer->AltBody = $text_invite; // Needed in order to include the ical part
 
-        $phpmailer->Ical = $ical;
+            $phpmailer->Ical = $ical;
+        }
     }
 
 }
