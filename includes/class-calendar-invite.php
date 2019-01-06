@@ -295,10 +295,15 @@ class Calendar_Invite {
         return get_option( $this->plugin_name . '-options' );
     }
 
+    /**
+     * Handles the ajax request to send the calendar invite
+     *
+     */
     public function send_calendar_invites_ajax() {
         if ( wp_verify_nonce( $_REQUEST['nonce'], "calendar-invite-send-invite")) {
             if(empty($_REQUEST['order_id'])) {
-                return 'Error obtaining order_id is REQUEST variables';
+                echo json_encode(array('type' => 'error', 'message' => 'Error obtaining order_id is REQUEST variables'));
+                die();
             }
             $order_id = $_REQUEST['order_id'];
             $message = $this->send_calendar_invites($order_id);
@@ -307,6 +312,11 @@ class Calendar_Invite {
         }
     }
 
+    /**
+     * @param $order_id
+     * @return string
+     * @throws \Exception
+     */
     public function send_calendar_invites($order_id) {
         $message = '';
         $order = new WC_Order($order_id);
@@ -413,10 +423,10 @@ class Calendar_Invite {
             //Collect output and echo
             $ical = ob_get_contents();
             ob_end_clean();
-
             $phpmailer->addStringAttachment($ical, 'invite.ics', 'base64', 'application/ics');
+
             ob_start();
-            /* @see ../public/partials/calendar-invite-ical.php */
+            /* @see ../public/partials/calendar-invite-mail-text.php */
             include(plugin_dir_path(dirname(__FILE__)) . 'public/partials/calendar-invite-mail-text.php');
             //Collect output and echo
             $text_invite = ob_get_contents();

@@ -11,6 +11,10 @@
  * @package    Calendar_Invite
  * @subpackage Calendar_Invite/public/partials
  */
+/**
+ * @var \WP_User $user
+ * @see \Calendar_Invite_Public::extra_user_profile_fields()
+ */
 ?>
 
 <p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">

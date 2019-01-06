@@ -121,6 +121,7 @@ class Calendar_Invite_Public {
 	    if( ! $user instanceof WP_User )
 	        $user = wp_get_current_user();
 
+	    /** @see ./partials/calendar-invite-user-options.php */
 	    include(plugin_dir_path( dirname( __FILE__ ) ) . 'public/partials/calendar-invite-user-options.php');
     }
 

@@ -11,6 +11,12 @@ if ( ! class_exists( 'PHPMailer', false ) ) {
  */
 class Calendar_Invite_Mailer extends \PHPMailer {
 
+    /**
+     * Replaces createBody in PHPMailer in order to support adding of ical files
+     *
+     * @throws phpmailerException
+     * @return string
+     */
     public function createBody() {
         $body = '';
         //Create unique IDs and preset boundaries

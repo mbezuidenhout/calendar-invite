@@ -1,8 +1,11 @@
+<?php
+/** @see \Calendar_Invite_Admin::settings_radio_field() */
+?>
 <fieldset>
 <?php
 $now = new DateTime();
 $custom_value_checked = '';
-if( ! in_array($atts['value'], $atts['options']));
+if( ! in_array($atts['value'], $atts['options']))
     $custom_value_checked = 'checked="checked"';
 foreach($atts['options'] as $option) {
     echo "<label>";

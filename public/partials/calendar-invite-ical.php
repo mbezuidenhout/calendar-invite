@@ -13,7 +13,11 @@
  * @subpackage  Calendar_Invite/public/partials
  */
 
-/** @var \Calendar_Invite_Calendar_Data $calendar_invite_data */
+/**
+ * @var \Calendar_Invite_Calendar_Data $calendar_invite_data
+ * @var \Calendar_Invite $this
+ * @see \Calendar_Invite::add_ical_mail_parts()
+ */
 ?>
 BEGIN:VCALENDAR
 PRODID:-//Marius Bezuidenhout//Calendar Invite <?php echo $this->get_version() ?>//EN

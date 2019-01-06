@@ -6,6 +6,10 @@
  * @package     Calendar_Invite
  * @subpackage  Calendar_Invite/admin/partials
  */
+/**
+ * @see \Calendar_Invite_Admin::options_page()
+ * @var $this \Calendar_Invite_Admin
+ */
 ?>
 <div class="wrap">
     <form method="post" id="mainform" action="options.php" enctype="multipart/form-data">

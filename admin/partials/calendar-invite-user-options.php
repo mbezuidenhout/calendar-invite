@@ -11,6 +11,7 @@
  * @package    Calendar_Invite
  * @subpackage Calendar_Invite/public/partials
  */
+/** @see \Calendar_Invite_Admin::extra_user_profile_fields() */
 ?>
 
 <h2>Calendar Invites</h2>

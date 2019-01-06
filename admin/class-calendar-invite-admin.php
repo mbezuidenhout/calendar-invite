@@ -139,6 +139,7 @@ class Calendar_Invite_Admin {
      * @param WP_User $user
      */
     public function extra_user_profile_fields($user) {
+        /** @see ./partials/calendar-invite-user-options.php */
         include(plugin_dir_path( dirname( __FILE__ ) ) . 'admin/partials/calendar-invite-user-options.php');
     }
 
@@ -157,9 +158,15 @@ class Calendar_Invite_Admin {
      * @since    1.0.0
      */
     public function options_page() {
-        include('partials/calendar-invite-settings.php');
+        /** @see ./partials/calendar-invite-settings.php */
+        include(plugin_dir_path( dirname( __FILE__ ) ) . 'admin/partials/calendar-invite-settings.php');
     }
 
+    /**
+     * Register admin settings
+     *
+     * @since   1.0.0
+     */
     public function settings_init() {
         register_setting(
             $this->plugin_name . '-basic-settings-group',
@@ -181,6 +188,11 @@ class Calendar_Invite_Admin {
         );
     }
 
+    /**
+     * Initialization of admin settings fields
+     *
+     * @since   1.0.0
+     */
     public function settings_fields_init() {
         add_settings_field(
             $this->plugin_name . '-date-field',
@@ -207,17 +219,6 @@ class Calendar_Invite_Admin {
             )
         );
 
-/*        add_settings_field(
-            $this->plugin_name . '-date-format-custom',
-            'Custom Date Format',
-            array( $this, 'settings_format_custom_field' ),
-            $this->plugin_name . '-basic-settings-page',
-            $this->plugin_name . '-basic',
-            array(
-                'id'    => $this->plugin_name . '-date-format-custom',
-            )
-        );*/
-
         add_settings_field(
             $this->plugin_name . '-time-field',
             'Time Field',
@@ -242,23 +243,25 @@ class Calendar_Invite_Admin {
             )
         );
 
-/*        add_settings_field(
-            $this->plugin_name . '-time-format-custom',
-            'Custom Time Format',
-            array( $this, 'settings_format_custom_field' ),
-            $this->plugin_name . '-basic-settings-page',
-            $this->plugin_name . '-basic',
-            array(
-                'id'    => $this->plugin_name . '-time-format-custom',
-            )
-        );*/
-
     }
 
+    /**
+     * Display of the settings page
+     *
+     * @param $params
+     * @since   1.0.0
+     */
     public function settings_section_basic( $params ) {
+        /** @see  ./partials/calendar-invite-admin-section-basic.php */
         include( plugin_dir_path( __FILE__ ) . 'partials/' . $this->plugin_name . '-admin-section-basic.php' );
     }
 
+    /**
+     * Params and display of text fields
+     *
+     * @param array $args
+     * @since   1.0.0
+     */
     public function settings_text_field($args = array()) {
         $defaults = array(
                 'class'         => 'regular-text',
@@ -277,9 +280,16 @@ class Calendar_Invite_Admin {
             $atts['value'] = $this->options[$atts['id']];
         }
 
+        /** @see ./partials/calendar-invite-admin-field-text.php */
         include( plugin_dir_path( __FILE__ ) . 'partials/' . $this->plugin_name . '-admin-field-text.php' );
     }
 
+    /**
+     * Params and display of radio fields
+     *
+     * @param array $args
+     * @since   1.0.0
+     */
     public function settings_radio_field($args = array()) {
         $defaults = array(
             'description'   => '',
@@ -300,11 +310,8 @@ class Calendar_Invite_Admin {
             $atts['custom-value'] = $this->options[$atts['id'] . '-custom'];
         }
 
+        /** @see ./partials/calendar-invite-admin-field-radio.php */
         include( plugin_dir_path( __FILE__ ) . 'partials/' . $this->plugin_name . '-admin-field-radio.php' );
-    }
-
-    public function settings_format_custom_field($args = array()) {
-        include( plugin_dir_path( __FILE__ ) . 'partials/' . $this->plugin_name . '-admin-field-custom-format.php' );
     }
 
     /**
@@ -313,6 +320,7 @@ class Calendar_Invite_Admin {
      * @param array $actions
      * @param WC_Order $order
      * @return array
+     * @since   1.0.0
      */
     public function add_calendar_invite_order_actions($actions, $order) {
         $items = $order->get_items();

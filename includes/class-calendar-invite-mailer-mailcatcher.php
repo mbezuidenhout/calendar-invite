@@ -11,6 +11,12 @@ if ( ! class_exists( 'PHPMailer', false ) ) {
  */
 class Calendar_Invite_Mailer extends \WPMailSMTP\MailCatcher {
 
+    /**
+     * Replaces createBody in PHPMailer where the WPMail plugin has been installed
+     *
+     * @throws phpmailerException
+     * @return string
+     */
     public function createBody() {
         $body = '';
         //Create unique IDs and preset boundaries

@@ -28,13 +28,16 @@
 	 * Although scripts in the WordPress core, Plugins and Themes may be
 	 * practising this, we should strive to set a better example in our own work.
 	 */
-	$(function() {
+	$( function() {
 		function myAdminNotice( msg, type ) {
+			var div;
+			var p;
+			var b;
+			var bSpan;
+			var h1;
 
-			/* create notice div */
-
-			var div = document.createElement( 'div' );
-			switch (type) {
+			div = document.createElement( 'div' );
+			switch ( type ) {
 				case 'error':
 					div.classList.add( 'notice', 'notice-error' );
 					break;
@@ -52,7 +55,7 @@
 
 			/* create paragraph element to hold message */
 
-			var p = document.createElement( 'p' );
+			p = document.createElement( 'p' );
 
 			/* Add message text */
 
@@ -66,13 +69,13 @@
 
 			/* Create Dismiss icon */
 
-			var b = document.createElement( 'button' );
+			b = document.createElement( 'button' );
 			b.setAttribute( 'type', 'button' );
 			b.classList.add( 'notice-dismiss' );
 
 			/* Add screen reader text to Dismiss icon */
 
-			var bSpan = document.createElement( 'span' );
+			bSpan = document.createElement( 'span' );
 			bSpan.classList.add( 'screen-reader-text' );
 			bSpan.appendChild( document.createTextNode( 'Dismiss this notice' ) );
 			b.appendChild( bSpan );
@@ -83,36 +86,36 @@
 
 			/* Insert notice after the first h1 */
 
-			var h1 = document.getElementsByTagName( 'h1' )[0];
-			h1.parentNode.insertBefore( div, h1.nextSibling);
+			h1 = document.getElementsByTagName( 'h1' )[0];
+			h1.parentNode.insertBefore( div, h1.nextSibling );
 
 
 			/* Make the notice dismissable when the Dismiss icon is clicked */
 
-			b.addEventListener( 'click', function () {
+			b.addEventListener( 'click', function() {
 				div.parentNode.removeChild( div );
 			});
 
 
 		}
 
-		$(".wc-action-button-invite").click(function (e) {
+		$( '.wc-action-button-invite' ).click( function( e ) {
+			var urlParams = new URLSearchParams( this.search );
+			var nonce = urlParams.get( '_wpnonce' );
+			var action = urlParams.get( 'action' );
+			var orderId = urlParams.get( 'order_id' );
 			e.preventDefault();
-			var urlParams = new URLSearchParams(this.search);
-			var nonce = urlParams.get('_wpnonce')
-			var action = urlParams.get('action');
-			var order_id = urlParams.get('order_id');
 
 			jQuery.ajax({
-				type: "post",
-				dataType: "json",
+				type: 'post',
+				dataType: 'json',
 				url: this.pathname,
-				data: {action: action, order_id: order_id, nonce: nonce},
-				success: function (response) {
-					if (response.type == "success") {
-						myAdminNotice(response.message, 'success');
+				data: { 'action': action, 'order_id': orderId, 'nonce': nonce},
+				success: function( response ) {
+					if ( 'success' == response.type ) {
+						myAdminNotice( response.message, 'success' );
 					} else {
-						myAdminNotice('Failed to send. Check wordpress log for details', 'error');
+						myAdminNotice( response.message, response.type );
 					}
 				}
 			});
