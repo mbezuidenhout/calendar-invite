@@ -212,6 +212,8 @@ class Calendar_Invite {
         $this->loader->add_action( 'woocommerce_edit_account_form', $plugin_public, 'extra_user_profile_fields');
         /* @see Calendar_Invite::save_extra_user_profile_fields() */
         $this->loader->add_action( 'woocommerce_save_account_details', $this, 'save_extra_user_profile_fields');
+
+        // Can also use the woocommerce action woocommerce_order_status_pending_to_processing
         /* @see Calendar_Invite::send_calendar_invites() */
         $this->loader->add_action( 'woocommerce_order_status_processing', $this, 'send_calendar_invites', 1, 1);
 

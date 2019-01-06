@@ -49,7 +49,7 @@ class Calendar_Invite_Admin {
      * @param       array    $options   Plugin options
 	 */
 	public function __construct( $plugin_name, $version, $options ) {
-
+        $this->logo = plugin_dir_url( dirname(__FILE__) ) . 'public/images/90451519716512050.png';
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
 		$this->options = $options;
@@ -63,6 +63,15 @@ class Calendar_Invite_Admin {
      * @var     array
      */
 	private $options;
+
+    /**
+     * Default logo
+     *
+     * @since   1.0.2
+     * @access  protected
+     * @var     string
+     */
+	protected $logo;
 
 	/**
 	 * Register the stylesheets for the admin area.
@@ -92,7 +101,7 @@ class Calendar_Invite_Admin {
 	 *
 	 * @since    1.0.0
 	 */
-	public function enqueue_scripts() {
+	public function enqueue_scripts($page) {
 
 		/**
 		 * This function is provided for demonstration purposes only.
@@ -106,6 +115,9 @@ class Calendar_Invite_Admin {
 		 * class.
 		 */
 
+        if( 'options-general.php' == $page ) {
+            wp_enqueue_media();
+        }
 		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/calendar-invite-admin.js', array( 'jquery' ), $this->version, false );
 
 	}
@@ -203,7 +215,7 @@ class Calendar_Invite_Admin {
             array(
                 'id'          => $this->plugin_name . '-date-field',
                 'description' => 'The order item meta data field to search for',
-                'value'       => 'Y-m-d'
+                'value'       => 'Date'
             )
         );
 
@@ -228,7 +240,7 @@ class Calendar_Invite_Admin {
             array(
                     'id'          => $this->plugin_name . '-time-field',
                     'description' => 'The order item meta data field to search for',
-                    'value'       => 'H:i'
+                    'value'       => 'Time'
             ));
 
         add_settings_field(
@@ -243,6 +255,18 @@ class Calendar_Invite_Admin {
             )
         );
 
+        add_settings_field(
+            $this->plugin_name . '-logo',
+            'Logo',
+            array( $this, 'settings_image' ),
+            $this->plugin_name . '-basic-settings-page',
+            $this->plugin_name . '-basic',
+            array(
+                'id'    => $this->plugin_name . '-logo',
+                'image' => $this->logo
+            )
+        );
+
     }
 
     /**
@@ -254,6 +278,26 @@ class Calendar_Invite_Admin {
     public function settings_section_basic( $params ) {
         /** @see  ./partials/calendar-invite-admin-section-basic.php */
         include( plugin_dir_path( __FILE__ ) . 'partials/' . $this->plugin_name . '-admin-section-basic.php' );
+    }
+
+    /**
+     * Params and display of selectable image fields
+     *
+     * @param array $args
+     * @since   1.0.2
+     */
+    public function settings_image( $args = array() ) {
+        $defaults = array(
+        );
+        $defaults = apply_filters( $this->plugin_name . '-field-image-options-defaults', $defaults );
+        $atts = wp_parse_args( $args, $defaults );
+
+        if( ! empty( $this->options[$atts['id']]) ) {
+            $atts['value'] = $this->options[$atts['id']];
+        }
+
+        /** @see ./partials/calendar-invite-admin-field-image */
+        include ( plugin_dir_path( __FILE__ ) . 'partials/' . $this->plugin_name . '-admin-field-image.php' );
     }
 
     /**
@@ -273,10 +317,10 @@ class Calendar_Invite_Admin {
                 'value'         => '',
                 'attribute'     => '',
         );
-        apply_filters( $this->plugin_name . 'field-text-options-defaults', $defaults );
+        $defaults = apply_filters( $this->plugin_name . '-field-text-options-defaults', $defaults );
         $atts = wp_parse_args( $args, $defaults );
 
-        if( ! empty( $this->options[$atts['id']])) {
+        if( ! empty( $this->options[$atts['id']]) ) {
             $atts['value'] = $this->options[$atts['id']];
         }
 
@@ -300,7 +344,7 @@ class Calendar_Invite_Admin {
             'value'         => '',
             'attribute'     => '',
         );
-        apply_filters( $this->plugin_name . 'field-radio-options-defaults', $defaults );
+        $defaults = apply_filters( $this->plugin_name . '-field-radio-options-defaults', $defaults );
         $atts = wp_parse_args( $args, $defaults );
 
         if( ! empty( $this->options[$atts['id']])) {
