@@ -364,8 +364,11 @@ class Calendar_Invite {
                         $message = $customer->get_email();
                 }
 
-                if(wp_mail($calendar_invite_data->get_organizer_email(), html_entity_decode($item->get_name()), $html_invite))
-                    $message .= " and " . $calendar_invite_data->get_organizer_email();
+                if(wp_mail($calendar_invite_data->get_organizer_email(), html_entity_decode($item->get_name()), $html_invite)) {
+                    if(!empty($message))
+                        $message .= " and ";
+                    $message .= $calendar_invite_data->get_organizer_email();
+                }
 
             }
 
