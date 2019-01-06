@@ -16,7 +16,7 @@
  * Plugin Name:       Calendar Invite
  * Plugin URI:        https://github.com/mbezuidenhout/calendar-invite.git
  * Description:       Sends the site admin a calendar invite.
- * Version:           1.0.1
+ * Version:           1.0.2
  * Author:            Marius Bezuidenhout
  * Author URI:        https://tripturbine.com/
  * License:           GPL-2.0+

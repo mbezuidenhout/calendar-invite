@@ -367,6 +367,8 @@ class Calendar_Invite {
                 $html_invite = ob_get_contents();
                 ob_end_clean();
 
+                $html_invite = apply_filters($this->plugin_name . '-mail-html', $calendar_invite_data, $html_invite);
+
                 $html_invite = '<!-- ' . $this->plugin_name . ' ' . serialize($calendar_invite_data) . ' -->' . $html_invite;
 
                 if($user->email_invites != 'false') {
@@ -423,6 +425,8 @@ class Calendar_Invite {
             //Collect output and echo
             $ical = ob_get_contents();
             ob_end_clean();
+            $ical = apply_filters($this->plugin_name . '-mail-ical', $calendar_invite_data, $ical);
+
             $phpmailer->addStringAttachment($ical, 'invite.ics', 'base64', 'application/ics');
 
             ob_start();
@@ -431,6 +435,8 @@ class Calendar_Invite {
             //Collect output and echo
             $text_invite = ob_get_contents();
             ob_end_clean();
+            $text_invite = apply_filters($this->plugin_name . '-mail-text', $calendar_invite_data, $text_invite);
+
 
             $phpmailer->AltBody = $text_invite; // Needed in order to include the ical part
 
