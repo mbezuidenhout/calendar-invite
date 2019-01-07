@@ -219,10 +219,24 @@ class Calendar_Invite {
 
         /* @see Calendar_Invite::send_calendar_invites_ajax() */
         $this->loader->add_action( 'wp_ajax_' . $this->plugin_name . '_send_invite', $this, 'send_calendar_invites_ajax');
+        /* @see \Calendar_Invite::get_image_ajax() */
+        $this->loader->add_action( 'wp_ajax_' . $this->plugin_name . '_get_image', $this, 'get_image_ajax');
         /* @see Calendar_Invite::set_custom_mailer() */
         $this->loader->add_action( 'plugins_loaded', $this, 'set_custom_mailer', 20);
         /* @see Calendar_Invite::add_ical_mail_parts() */
         $this->loader->add_action( 'phpmailer_init', $this, 'add_ical_mail_parts', 1, 1);
+    }
+
+    function get_image_ajax() {
+        if(isset($_GET['id']) ){
+            $image = wp_get_attachment_image( filter_input( INPUT_GET, 'id', FILTER_VALIDATE_INT ), 'medium', false, array( 'id' => $this->plugin_name.'-preview-image' ) );
+            $data = array(
+                'image'    => $image,
+            );
+            wp_send_json_success( $data );
+        } else {
+            wp_send_json_error();
+        }
     }
 
 	/**
@@ -304,13 +318,11 @@ class Calendar_Invite {
     public function send_calendar_invites_ajax() {
         if ( wp_verify_nonce( $_REQUEST['nonce'], "calendar-invite-send-invite")) {
             if(empty($_REQUEST['order_id'])) {
-                echo json_encode(array('type' => 'error', 'message' => 'Error obtaining order_id is REQUEST variables'));
-                die();
+                wp_send_json_error(array('type' => 'error', 'message' => 'Error obtaining order_id is REQUEST variables'));
             }
             $order_id = $_REQUEST['order_id'];
             $message = $this->send_calendar_invites($order_id);
-            echo json_encode(array('type' => 'success', 'message' => 'Order #' . $order_id . ' invite successfully sent to ' . $message));
-            die();
+            wp_send_json_success(array('type' => 'success', 'message' => 'Order #' . $order_id . ' invite successfully sent to ' . $message));
         }
     }
 

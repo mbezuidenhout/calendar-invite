@@ -11,5 +11,5 @@ if( !empty( $atts['value'] ) ) {
 }
 ?>
 <?php echo $image; ?>
-<input type="hidden" name="<?php echo $this->plugin_name ?>_image_id" id="<?php $this->plugin_name ?>_image_id" value="<?php echo esc_attr( $atts['value'] ); ?>" class="regular-text" />
-<input type='button' class="button-primary" value="<?php esc_attr_e( 'Select an image', $this->plugin_name ); ?>" id="<?php $this->plugin_name ?>_media_manager"/>
+<input type="hidden" name="<?php echo $this->plugin_name ?>_image_id" id="<?php echo $this->plugin_name ?>_image_id" value="<?php echo esc_attr( $atts['value'] ); ?>" class="regular-text" /><br>
+<input type='button' class="button-primary" value="<?php esc_attr_e( 'Select an image', $this->plugin_name ); ?>" id="<?php echo $this->plugin_name ?>_media_manager"/>

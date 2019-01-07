@@ -90,7 +90,7 @@
 			h1.parentNode.insertBefore( div, h1.nextSibling );
 
 
-			/* Make the notice dismissable when the Dismiss icon is clicked */
+			/* Make the notice dismissible when the Dismiss icon is clicked */
 
 			b.addEventListener( 'click', function() {
 				div.parentNode.removeChild( div );
@@ -98,6 +98,73 @@
 
 
 		}
+
+		function refreshImage( imageId ) {
+			var data = {
+				action: 'myprefix_get_image',
+				id: imageId
+			};
+
+			jQuery.get(ajaxurl, data, function( response ) {
+
+				if ( true === response.success ) {
+					jQuery( '#calendar-invite-preview-image' ).replaceWith( response.data.image );
+				}
+			});
+		}
+
+		$( 'input#calendar-invite_media_manager' ).click( function( e ) {
+			var imageFrame;
+
+			e.preventDefault();
+			if ( imageFrame ) {
+				imageFrame.open();
+			}
+
+			// Define image_frame as wp.media object
+			imageFrame = wp.media({
+				title: 'Select Media',
+				multiple: false,
+				library: {
+					type: 'image',
+				}
+			});
+
+			imageFrame.on( 'close', function() {
+
+				// On close, get selections and save to the hidden input
+				// plus other AJAX stuff to refresh the image preview
+				var selection =  imageFrame.state().get( 'selection' );
+				var galleryIds = new Array();
+				var myIndex = 0;
+				var ids;
+				selection.each( function( attachment ) {
+					galleryIds[myIndex] = attachment['id'];
+					myIndex++;
+				});
+				ids = galleryIds.join( ',' );
+				jQuery( 'input#calendar-invite_image_id' ).val( ids );
+				refreshImage( ids );
+			});
+
+			imageFrame.on( 'open', function() {
+				var ids;
+
+				// On open, get the id from the hidden input
+				// and select the appropriate images in the media manager
+				var selection =  imageFrame.state().get( 'selection' );
+				ids = jQuery( 'input#calendar-invite_image_id' ).val().split( ',' );
+				ids.forEach( function( id ) {
+					var attachment;
+					attachment = wp.media.attachment( id );
+					attachment.fetch();
+					selection.add( attachment ? [ attachment ] : []);
+				});
+
+			});
+
+			imageFrame.open();
+		});
 
 		$( '.wc-action-button-invite' ).click( function( e ) {
 			var urlParams = new URLSearchParams( this.search );
@@ -112,10 +179,11 @@
 				url: this.pathname,
 				data: { 'action': action, 'order_id': orderId, 'nonce': nonce},
 				success: function( response ) {
-					if ( 'success' == response.type ) {
-						myAdminNotice( response.message, 'success' );
+					debugger;
+					if ( 'success' == response.success ) {
+						myAdminNotice( response.data.message, 'success' );
 					} else {
-						myAdminNotice( response.message, response.type );
+						myAdminNotice( response.data.message, response.data.type );
 					}
 				}
 			});
